@@ -1,0 +1,56 @@
+name: Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify module imports
+        run: |
+          python -c "import ai_testing_agent; print('ai_testing_agent OK')"
+          python -c "import cli; print('cli OK')"
+          python -c "import spec_ingestion; print('spec_ingestion OK')"
+          python -c "import failure_analyzer; print('failure_analyzer OK')"
+          python -c "import request_body_handler; print('request_body_handler OK')"
+          python -c "import auth_handler; print('auth_handler OK')"
+          python -c "import code_analyzer; print('code_analyzer OK')"
+          python -c "import env_manager; print('env_manager OK')"
+          python -c "import analytics; print('analytics OK')"
+          python -c "import data_manager; print('data_manager OK')"
+          python -c "import compliance; print('compliance OK')"
+          python -c "import chain_detector; print('chain_detector OK')"
+          python -c "import chain_test_generator; print('chain_test_generator OK')"
+
+      - name: Run tests
+        run: |
+          python -m pytest \
+            test_ai_routing.py \
+            test_analytics.py \
+            test_usage_tracking.py \
+            test_spec_ingestion.py \
+            test_failure_analyzer.py \
+            test_compliance.py \
+            test_chain_detector.py \
+            -v --tb=short

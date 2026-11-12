@@ -1,0 +1,27 @@
+# Docker Compose for AI Testing Agent
+
+version: '3.8'
+
+services:
+  ai-testing-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-testing-agent:latest
+    container_name: ai-testing-agent
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    volumes:
+      - ./test_output:/app/test_output
+      - ./requirements:/app/requirements:ro
+      - ai-agent-data:/root/.ai-testing-agent
+    command: python cli.py run /app/requirements/example_requirements.txt
+    restart: unless-stopped
+
+networks:
+  ai-agent-network:
+    driver: bridge
+
+volumes:
+  ai-agent-data:
+    driver: local
